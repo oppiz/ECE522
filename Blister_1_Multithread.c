@@ -2,6 +2,7 @@
 #include <math.h>
 //#include <stdint.h>
 #include <inttypes.h>
+#include <pthread.h>
 
 uint64_t power(int a, int b){
     uint64_t tmp = 1;
@@ -29,10 +30,12 @@ void *Fun(){
 
  int main(int argc, char *argv[]){
 
-   
+    pthread_t tid; 
     for (int i = 0; i < 3; i++) {
-         Fun();
+        pthread_create(&tid, NULL, Fun, (void *)&tid); 
     }
+       
+    pthread_exit(NULL); 
 
     return 0;
 }
