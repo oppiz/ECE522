@@ -1,6 +1,7 @@
 #!/bin/bash
 
 clear
+
 #Fib
 echo "Compile and time fibonacci -O0"
 time gcc fibonacci.c -o fibonacci_O0 -std=c11 -O0 -lgmp
