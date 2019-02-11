@@ -31,7 +31,7 @@ int Datastore_init(){
       fprintf(stdout, "Opened database successfully\n");
    }
 
-   sql = "CREATE TABLE IF NOT EXISTS PLCValues(ID INTEGER PRIMARY KEY AUTOINCREMENT, [timestamp] timestamp, \
+   sql = "CREATE TABLE IF NOT EXISTS PLCValues(ID INTEGER PRIMARY KEY AUTOINCREMENT, TEXT DEFAULT CURRENT_TIMESTAMP, \
         x001 NUMERIC, x002 NUMERIC, x003 NUMERIC, x004 NUMERIC, x005 NUMERIC, x006 NUMERIC, x007 NUMERIC, x008 NUMERIC,\
         x201 NUMERIC, x202 NUMERIC, x203 NUMERIC, x204 NUMERIC, x205 NUMERIC, x206 NUMERIC, x207 NUMERIC, x208 NUMERIC,\
         y001 NUMERIC, y002 NUMERIC, y003 NUMERIC, y004 NUMERIC, y005 NUMERIC, y006 NUMERIC,\
@@ -54,18 +54,35 @@ int Datastore_init(){
 int Datastore_insert(Modbus_Read p){
 
     char sql[1024];
-    char *zErrMsg = 0;
+    char *err_msg = 0;
 
-    time_t current_time = time(NULL);
+    char TimeStamp[20];
+    time_t now = time(NULL);
+    strftime(TimeStamp, 20, "%Y-%m-%d %H:%M:%S", localtime(&now));
+    printf("%s\n",TimeStamp);
 
-    //sql = "INSERT INTO PLCValues VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     snprintf(sql, sizeof(sql), \
-        "INSERT INTO PLCValues VALUES(%i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %f, %f, %f, %f)", \
-        p.regs1[0], p.regs1[1], p.regs1[2], p.regs1[3], p.regs1[4], p.regs1[5], p.regs1[6], p.regs1[7],\
+        "INSERT INTO PLCValues VALUES(%s, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %f, %f, %f, %f)", \
+        TimeStamp, p.regs1[0], p.regs1[1], p.regs1[2], p.regs1[3], p.regs1[4], p.regs1[5], p.regs1[6], p.regs1[7],\
         p.regs2[0], p.regs2[1], p.regs2[2], p.regs2[3], p.regs2[4], p.regs2[5], p.regs2[6], p.regs2[7],\
         p.regs3[0], p.regs3[1], p.regs3[2], p.regs3[3], p.regs3[4], p.regs3[5], p.Temp, p.Humid, 0, 0);
 
-        printf(sql);
+    printf(sql);
+
+    int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    
+    if (rc != SQLITE_OK ) {
+        
+        fprintf(stderr, "SQL error: %s\n", err_msg);
+        
+        sqlite3_free(err_msg);        
+        sqlite3_close(db);
+        
+        return -1;
+    } 
+
+    return 0;
+
 }
 
 void Datastore_Close(){
