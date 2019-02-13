@@ -61,8 +61,8 @@ Modbus_Read Modbus_read(){
 	//for (int i=0; i < rc2; i++) {
 	//    printf("%i \n", Store_read.regs1[i]);
 	//}
-	
-	rc3 = modbus_read_input_bits(ctx, 64, 8, Store_read.regs2);
+
+	rc3 = modbus_read_bits(ctx, 8192, 6, Store_read.regs2);
 	if (rc3 == -1) {
 	    fprintf(stderr, "%s\n", modbus_strerror(errno));
 	    Store_read.Error = -1;
@@ -71,8 +71,8 @@ Modbus_Read Modbus_read(){
 	//for (int i=0; i < rc3; i++) {
 	//    printf("%i \n", Store_read.regs2[i]);
 	//}
-
-	rc4 = modbus_read_bits(ctx, 8192, 6, Store_read.regs3);
+	
+	rc4 = modbus_read_input_bits(ctx, 64, 8, Store_read.regs3);
 	if (rc4 == -1) {
 	    fprintf(stderr, "%s\n", modbus_strerror(errno));
 	    Store_read.Error = -1;

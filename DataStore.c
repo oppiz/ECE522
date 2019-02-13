@@ -33,8 +33,8 @@ int Datastore_init(){
 
    sql = "CREATE TABLE IF NOT EXISTS PLCValues(ID INTEGER PRIMARY KEY AUTOINCREMENT, TEXT DEFAULT CURRENT_TIMESTAMP, \
         x001 NUMERIC, x002 NUMERIC, x003 NUMERIC, x004 NUMERIC, x005 NUMERIC, x006 NUMERIC, x007 NUMERIC, x008 NUMERIC,\
-        x201 NUMERIC, x202 NUMERIC, x203 NUMERIC, x204 NUMERIC, x205 NUMERIC, x206 NUMERIC, x207 NUMERIC, x208 NUMERIC,\
         y001 NUMERIC, y002 NUMERIC, y003 NUMERIC, y004 NUMERIC, y005 NUMERIC, y006 NUMERIC,\
+        x201 NUMERIC, x202 NUMERIC, x203 NUMERIC, x204 NUMERIC, x205 NUMERIC, x206 NUMERIC, x207 NUMERIC, x208 NUMERIC,\
         df1 REAL, df2  REAL, df3 REAL, df4 REAL)";
 
     rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
@@ -53,35 +53,69 @@ int Datastore_init(){
 
 int Datastore_insert(Modbus_Read p){
 
-    char sql[1024];
-    char *err_msg = 0;
+   char *err_msg = 0;
+   sqlite3_stmt *res;
 
-    char TimeStamp[20];
-    time_t now = time(NULL);
-    strftime(TimeStamp, 20, "%Y-%m-%d %H:%M:%S", localtime(&now));
-    printf("%s\n",TimeStamp);
+   //pull current time
+   char TimeStamp[20];
+   time_t now = time(NULL);
+   strftime(TimeStamp, 20, "%Y-%m-%d %H:%M:%S", localtime(&now));
+   printf("%s\n",TimeStamp);
 
-    snprintf(sql, sizeof(sql), \
-        "INSERT INTO PLCValues VALUES(%s, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %f, %f, %f, %f)", \
-        TimeStamp, p.regs1[0], p.regs1[1], p.regs1[2], p.regs1[3], p.regs1[4], p.regs1[5], p.regs1[6], p.regs1[7],\
-        p.regs2[0], p.regs2[1], p.regs2[2], p.regs2[3], p.regs2[4], p.regs2[5], p.regs2[6], p.regs2[7],\
-        p.regs3[0], p.regs3[1], p.regs3[2], p.regs3[3], p.regs3[4], p.regs3[5], p.Temp, p.Humid, 0, 0);
+   char *sql = "INSERT INTO PLCValues VALUES(null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    printf(sql);
-
-    int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+   int rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
     
-    if (rc != SQLITE_OK ) {
-        
-        fprintf(stderr, "SQL error: %s\n", err_msg);
-        
-        sqlite3_free(err_msg);        
-        sqlite3_close(db);
-        
-        return -1;
-    } 
+   if (rc == SQLITE_OK ) {
 
-    return 0;
+      //Bind the variables  
+     	sqlite3_bind_text(res, 1, TimeStamp, -1, SQLITE_TRANSIENT);
+      sqlite3_bind_int(res, 2, p.regs1[0]);
+      sqlite3_bind_int(res, 3, p.regs1[1]);
+      sqlite3_bind_int(res, 4, p.regs1[2]);
+      sqlite3_bind_int(res, 5, p.regs1[3]);
+      sqlite3_bind_int(res, 6, p.regs1[4]);
+      sqlite3_bind_int(res, 7, p.regs1[5]);
+      sqlite3_bind_int(res, 8, p.regs1[6]);
+      sqlite3_bind_int(res, 9, p.regs1[7]);
+
+      sqlite3_bind_int(res, 10, p.regs2[0]);
+      sqlite3_bind_int(res, 11, p.regs2[1]);
+      sqlite3_bind_int(res, 12, p.regs2[2]);
+      sqlite3_bind_int(res, 13, p.regs2[3]);
+      sqlite3_bind_int(res, 14, p.regs2[4]);
+      sqlite3_bind_int(res, 15, p.regs2[5]);
+
+      sqlite3_bind_int(res, 16, p.regs3[0]);
+      sqlite3_bind_int(res, 17, p.regs3[1]);
+      sqlite3_bind_int(res, 18, p.regs3[2]);
+      sqlite3_bind_int(res, 19, p.regs3[3]);
+      sqlite3_bind_int(res, 20, p.regs3[4]);
+      sqlite3_bind_int(res, 21, p.regs3[5]);
+      sqlite3_bind_int(res, 22, p.regs3[6]);
+      sqlite3_bind_int(res, 23, p.regs3[7]);
+
+		sqlite3_bind_double(res, 24, p.Temp);      
+      sqlite3_bind_double(res, 25, p.Humid);
+      sqlite3_bind_double(res, 26, 0);
+      sqlite3_bind_double(res, 27, 0);
+        
+   }else{
+        
+        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
+        return -1;
+   } 
+
+   int step = sqlite3_step(res);
+    
+   if (step == SQLITE_ROW) {
+        
+      printf("%s: ", sqlite3_column_text(res, 0));
+      printf("%s\n", sqlite3_column_text(res, 1));
+        
+   } 
+
+   sqlite3_finalize(res);
 
 }
 

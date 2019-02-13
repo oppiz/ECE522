@@ -7,8 +7,8 @@
 typedef struct {
     double Temp, Humid;
     uint8_t regs1[8];
-    uint8_t regs2[8];
-    uint8_t regs3[6];
+    uint8_t regs2[6];
+    uint8_t regs3[8];
     uint8_t Error;
 } Modbus_Read;
 
