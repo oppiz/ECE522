@@ -4,6 +4,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QDate, QDateTime, QTime
 from datetime import datetime, timedelta
 
+import numpy as np
 from numpy import arange, sin, pi
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
