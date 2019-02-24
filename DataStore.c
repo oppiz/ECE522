@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 #include <sqlite3.h> 
 
@@ -18,11 +19,11 @@ static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
    return 0;
 }
 
-int Datastore_init(){
+int Datastore_init(char DB_Path[]){
     
     char *sql;
     char *zErrMsg = 0;
-    int rc = sqlite3_open("test.db", &db);
+    int rc = sqlite3_open(DB_Path, &db);
     
    if( rc ) {
       fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
@@ -116,9 +117,11 @@ int Datastore_insert(Modbus_Read p){
    } 
 
    sqlite3_finalize(res);
+   return 0;
 
 }
 
 void Datastore_Close(){
     sqlite3_close(db);
+    
 }

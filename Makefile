@@ -1,5 +1,6 @@
 #Compilers
-CC          := gcc -std=c11 
+CC          := gcc -std=gnu99 
+#CC          := gcc -std=C11 
 
 #The Target Binary Program
 TARGET      := test
