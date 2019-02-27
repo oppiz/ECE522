@@ -17,7 +17,7 @@ typedef struct {
     uint8_t regs1[8];
     uint8_t regs2[6];
     uint8_t regs3[8];
-    uint8_t Error;
+    int8_t Error;
 } Modbus_Read;
 
 
@@ -27,6 +27,15 @@ typedef struct {
  * \param DB_name_path Name and path of database file.
  */
 int Modbus_init(char IP_Addr[]); 
+
+/*! \fn Modbus_read 
+ *  Read various registers/coils over Modbus TCP
+ * \param Modbus coil to start reading at
+ * \param How many coils to read
+ * \param destination of coil info
+ * \param Sett error bit
+ */
+void Modbus_PULL(int addr, int nd, uint8_t *dest, int8_t *Error);
 
 /*! \fn Modbus_read 
  *  Read various registers/coils over Modbus TCP
