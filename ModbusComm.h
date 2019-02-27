@@ -28,7 +28,7 @@ typedef struct {
  */
 int Modbus_init(char IP_Addr[]); 
 
-/*! \fn Modbus_read 
+/*! \fn Modbus_PULL 
  *  Read various registers/coils over Modbus TCP
  * \param Modbus coil to start reading at
  * \param How many coils to read
@@ -38,7 +38,7 @@ int Modbus_init(char IP_Addr[]);
 void Modbus_PULL(int addr, int nd, uint8_t *dest, int8_t *Error);
 
 /*! \fn Modbus_read 
- *  Read various registers/coils over Modbus TCP
+ *  Setup to Read various registers/coils over Modbus TCP
  *  Returns Type Modbus_Read
  */
 Modbus_Read Modbus_read();
