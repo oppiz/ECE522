@@ -36,18 +36,28 @@ float float32_from_two_uint16(uint16_t MSB_uint, uint16_t LSB_uint){
 	return union_for_conv.f_number;
 }
 
+//This could be more sophisticated
+void ERROR_HANDLE(){
+		
+	    fprintf(stderr, "%s\n", modbus_strerror(errno));
+		//try and reconnect! https://libmodbus.org/docs/v3.0.6/modbus_set_error_recovery.html
+		int d = modbus_set_error_recovery(ctx, MODBUS_ERROR_RECOVERY_LINK);
+		//modbus_set_error_recovery() returns 0 on success if that didn't work try the other option
+		if (d != 0){
+			int e = modbus_set_error_recovery(ctx, MODBUS_ERROR_RECOVERY_PROTOCOL);
+		}
+		//If recovery failes 200 times, dump, is 200 the best number?
+		Modbus_error_count++;
+		assert(Modbus_error_count < 200);
+}
+
 void Modbus_PULL(int addr, int nd, uint8_t *dest, int8_t *Error){
   	int rc = modbus_read_input_bits(ctx, addr, nd, dest);
 	if (rc == -1) {
-	    fprintf(stderr, "%s\n", modbus_strerror(errno));
-	    *Error = -1;
-		//try and reconnect!
-		int d = modbus_set_error_recovery(ctx, MODBUS_ERROR_RECOVERY_LINK);
-		
-		//If reconnect failes 200 times, dump
-		Modbus_error_count++;
-		assert(Modbus_error_count < 200);
-		
+		//Call error handle function
+		ERROR_HANDLE();
+		//Set read as error for datawrite
+		*Error = -1;
 	}else{
 		//not in error
 		*Error = 0;
@@ -56,17 +66,19 @@ void Modbus_PULL(int addr, int nd, uint8_t *dest, int8_t *Error){
 
 }
 
+
 Modbus_Read Modbus_read(){
     
     Modbus_Read Store_read;
 
     uint16_t tab_reg[4];
-    int rc1, rc2, rc3, rc4;
-    
-    
-    rc1 = modbus_read_input_registers(ctx, 28672, 4, tab_reg);
+
+	//Doubles are handled different, do not call with MODBUS_PULL    
+    int rc1 = modbus_read_input_registers(ctx, 28672, 4, tab_reg);
 	if (rc1 == -1) {
-	    fprintf(stderr, "%s\n", modbus_strerror(errno));
+	    //Call error handle function
+		ERROR_HANDLE();
+		//Set read as error for datawrite
 	    Store_read.Error = -1;
 	}else{
 		//not in error

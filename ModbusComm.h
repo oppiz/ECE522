@@ -28,12 +28,19 @@ typedef struct {
  */
 int Modbus_init(char IP_Addr[]); 
 
+
+/*! \fn ERROR_HANDLE 
+ *  Attempts to reconnected and correct communication errors
+ *  https://libmodbus.org/docs/v3.0.6/modbus_set_error_recovery.html
+ */
+void ERROR_HANDLE();
+
 /*! \fn Modbus_PULL 
  *  Read various registers/coils over Modbus TCP
  * \param Modbus coil to start reading at
  * \param How many coils to read
  * \param destination of coil info
- * \param Sett error bit
+ * \param Set error bit
  */
 void Modbus_PULL(int addr, int nd, uint8_t *dest, int8_t *Error);
 

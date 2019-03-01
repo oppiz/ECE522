@@ -19,8 +19,9 @@ int main(int argc, char **argv) {
 
 	//Enter parms
 	char IP_Addr[] = "192.168.2.250";	
+	//char IP_Addr[] = "127.0.0.1"; //Use for SSH Tunnel
 	char DB_Path[] = "test.db";
-	uint16_t delay = 3;
+	uint16_t delay = 10;
 
 	int16_t MODBUSINIT = Modbus_init(IP_Addr);
 	//fail if unable to open modbus connetion

@@ -9,7 +9,6 @@
 
 static sqlite3 *db;
 
-
 static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
    int i;
    for(i = 0; i<argc; i++) {
@@ -107,6 +106,7 @@ int Datastore_insert(Modbus_Read p){
         return -1;
    } 
 
+   //evaluate the statement. https://www.sqlite.org/docs.html
    int step = sqlite3_step(res);
     
    if (step == SQLITE_ROW) {
