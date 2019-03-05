@@ -3,8 +3,8 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QDate, QDateTime, QTime
 from datetime import datetime, timedelta
+from time import gmtime, strftime
 
-import numpy as np
 from numpy import arange, sin, pi
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas, NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
@@ -12,6 +12,8 @@ import sqlite3
 import os
 
 from matplotlib.figure import Figure
+
+UseNow = True
 
 class Ui_Form(object):
     def setupUi(self, Form):
@@ -23,7 +25,7 @@ class Ui_Form(object):
 
         Form.setObjectName("Form")
         Form.setWindowTitle("GraphIt")
-        Form.resize(800,480)
+        Form.resize(800,440)
 
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -32,7 +34,7 @@ class Ui_Form(object):
         Form.setSizePolicy(sizePolicy)
 
         self.widget = QtWidgets.QWidget(Form)
-        self.widget.setGeometry(QtCore.QRect(50, 380, 687, 89))
+        self.widget.setGeometry(QtCore.QRect(50, 340, 687, 89))
         self.widget.setObjectName("widget")
 
         self.gridLayout = QtWidgets.QGridLayout(self.widget)    
@@ -41,7 +43,7 @@ class Ui_Form(object):
         self.gridLayout.setObjectName("gridLayout")
 
         self.graphicsView = QtWidgets.QWidget(Form)
-        self.graphicsView.setGeometry(QtCore.QRect(5, 11, 791, 361))
+        self.graphicsView.setGeometry(QtCore.QRect(5, 11, 791, 341))
         self.graphicsView.setObjectName("graphicsView")
 
 
@@ -59,7 +61,7 @@ class Ui_Form(object):
         #self.canvas = FigureCanvas(figure)
         self.canvas = FigureCanvas(self.figure)
         
-        self.canvas.setGeometry(0, 0, 800, 480)
+        self.canvas.setGeometry(0, 0, 800, 440)
         self.mpl_toolbar = NavigationToolbar(self.canvas, self.graphicsView) #toolbar
         self.canvas.mpl_connect('key_press_event', self.on_key_press) #toolbar
         lay = QtWidgets.QVBoxLayout(self.graphicsView)
@@ -216,8 +218,13 @@ class Ui_Form(object):
                 SqGetString = SqGetString + self.GraphtoSqlName(self.Graph4_Select.currentText())
 
             ST = self.StartTime.dateTime().toString("yyyy-MM-dd hh:mm:ss")
-            ET = self.EndTime.dateTime().toString("yyyy-MM-dd hh:mm:ss")
+            #Check and use current time or selected time
+            if UseNow:
+              ET = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+            else:
+              ET = self.EndTime.dateTime().toString("yyyy-MM-dd hh:mm:ss")
             
+            print(ET)
             SqGetString = SqGetString + " FROM PLCValues where timestamp BETWEEN '" + ST + "' AND '" + ET + "'"
             print(SqGetString)
           
@@ -302,6 +309,8 @@ class Ui_Form(object):
         for row in data:
             dates.append(row[0])
             info.append(row[count])
+            #print(*data , sep = "\n")
+        print("Done with data")
         return[dates, info]
         #if count == 1:
         #    self.axis.plot(dates, info, color)
@@ -351,11 +360,15 @@ class Ui_Form(object):
         if enabled:
             print("enabled")
             self.EndTime.setEnabled(False)
+            UseNow = True
+            print("Use Now time")
         else:
             print("disabled")
             self.EndTime.setEnabled(True)
             self.EndTime.setDate(QDate.currentDate())
             self.EndTime.setTime(QTime.currentTime())
+            UseNow = False
+            print("Use Selected Time")
 
     def on_key_press(self, event):
         print('you pressed', event.key)

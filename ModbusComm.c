@@ -42,10 +42,10 @@ void ERROR_HANDLE(){
 	    fprintf(stderr, "%s\n", modbus_strerror(errno));
 		//try and reconnect! https://libmodbus.org/docs/v3.0.6/modbus_set_error_recovery.html
 		int d = modbus_set_error_recovery(ctx, MODBUS_ERROR_RECOVERY_LINK);
-		//modbus_set_error_recovery() returns 0 on success if that didn't work try the other option
-		if (d != 0){
-			int e = modbus_set_error_recovery(ctx, MODBUS_ERROR_RECOVERY_PROTOCOL);
-		}
+		//modbus_set_error_recovery() returns 0 on success 
+		//Try other error recovery
+		int e = modbus_set_error_recovery(ctx, MODBUS_ERROR_RECOVERY_PROTOCOL);
+		
 		//If recovery failes 200 times, dump, is 200 the best number?
 		Modbus_error_count++;
 		assert(Modbus_error_count < 200);
@@ -85,14 +85,23 @@ Modbus_Read Modbus_read(){
 		Store_read.Error = 0;
 	}
 
-	Store_read.Temp = float32_from_two_uint16(tab_reg[1],tab_reg[0]);
-	Store_read.Humid = float32_from_two_uint16(tab_reg[3],tab_reg[2]);
+	//Error checking data. Temp seems to be messed up on poor reads. 
+	//Add error checking for binary values 1 or 0 
+	if ((float32_from_two_uint16(tab_reg[1],tab_reg[0]) > -50) && (float32_from_two_uint16(tab_reg[1],tab_reg[0]) < 150)){
+		Store_read.Temp = float32_from_two_uint16(tab_reg[1],tab_reg[0]);
+		Store_read.Humid = float32_from_two_uint16(tab_reg[3],tab_reg[2]);
 	
-	Modbus_PULL(0, 8, Store_read.regs1, &Store_read.Error);
-	Modbus_PULL(8192, 6, Store_read.regs2, &Store_read.Error);
-	Modbus_PULL(64, 8, Store_read.regs3, &Store_read.Error);
+		Modbus_PULL(0, 8, Store_read.regs1, &Store_read.Error);
+		Modbus_PULL(8192, 6, Store_read.regs2, &Store_read.Error);
+		Modbus_PULL(64, 8, Store_read.regs3, &Store_read.Error);
 
-    return Store_read;
+    	return Store_read;
+
+	}
+
+	//Something weird happened, do not write
+	Store_read.Error = -1;
+	return Store_read;
 
 }
 

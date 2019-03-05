@@ -11,7 +11,7 @@ import subprocess
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(800, 480)
+        Form.resize(800, 460)
         Form.setWindowTitle("Form")
 
         self.timer = QTimer()
@@ -28,11 +28,11 @@ class Ui_Form(object):
 
 
         self.lcdTemp = QtWidgets.QLCDNumber(Form)
-        self.lcdTemp.setGeometry(QtCore.QRect(70, 270, 250, 125))
+        self.lcdTemp.setGeometry(QtCore.QRect(70, 250, 250, 125))
         self.lcdTemp.setObjectName("lcdTemp")
 
         self.lcdHumid = QtWidgets.QLCDNumber(Form)
-        self.lcdHumid.setGeometry(QtCore.QRect(470, 270, 250, 125))
+        self.lcdHumid.setGeometry(QtCore.QRect(470, 250, 250, 125))
         self.lcdHumid.setObjectName("lcdHumid")
 
         
@@ -47,7 +47,7 @@ class Ui_Form(object):
         self.Close_Button.setObjectName("Close")
 
         self.label = QtWidgets.QLabel("Temperature", Form)
-        self.label.setGeometry(QtCore.QRect(120, 410, 131, 41))
+        self.label.setGeometry(QtCore.QRect(120, 370, 131, 41))
 
         font = QtGui.QFont()
         font.setPointSize(14)
@@ -59,7 +59,7 @@ class Ui_Form(object):
         self.label.setObjectName("label")
 
         self.label_2 = QtWidgets.QLabel("Humidity", Form)
-        self.label_2.setGeometry(QtCore.QRect(550, 410, 101, 41))
+        self.label_2.setGeometry(QtCore.QRect(550, 370, 101, 41))
         self.label_2.setFont(font)
         self.label_2.setAlignment(QtCore.Qt.AlignCenter)
         self.label_2.setTextInteractionFlags(QtCore.Qt.NoTextInteraction)
